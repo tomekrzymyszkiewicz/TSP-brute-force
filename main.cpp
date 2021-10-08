@@ -28,25 +28,27 @@ adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
 struct Result
 {
     string graph_name;
-    int *path;
+    string path;
+    int path_weight;
     double time;
     int number_of_repeats;
-    Result(string graph_name, int *path, double time, int number_of_repeats)
+    Result(string graph_name, string path,int path_weight, double time, int number_of_repeats)
     {
         this->graph_name = graph_name;
         this->path = path;
+        this->path_weight = path_weight;
         this->time = time;
         this->number_of_repeats = number_of_repeats;
     }
     string toString()
     {
-        string path_string = "";
-        for (int i = 0; i < number_of_current_graph_vertices; i++)
-        {
-            path_string += path[i];
-            path_string += " ";
-        }
-        return (graph_name + "," + path_string + "," + to_string(time) + "," + to_string(number_of_repeats));
+        // string path_string = "";
+        // for (int i = 0; i < number_of_current_graph_vertices; i++)
+        // {
+        //     path_string += path[i];
+        //     path_string += " ";
+        // }
+        return (graph_name + "," + path + "," + to_string(path_weight) + "," + to_string(time) + "," + to_string(number_of_repeats));
     }
 };
 
@@ -55,7 +57,7 @@ void save_results(string results_file_name)
     std::cout << "Saving results" << endl;
     fstream fout;
     fout.open(results_file_name, ios::out);
-    fout << "graph_name,path,time,number_of_repeats" << endl;
+    fout << "graph_name,path,path_weight,time,number_of_repeats" << endl;
     for (int i = 0; i < results.size(); i++)
     {
         fout << results[i] << endl;
@@ -195,31 +197,37 @@ vector<int> TSP_brute_force()
 {
     int source_vertex = 0;
     vector<int> nodes;
-    for(int i = 0; i < number_of_current_graph_vertices; i++){
-        if(i != source_vertex){
+    for (int i = 0; i < number_of_current_graph_vertices; i++)
+    {
+        if (i != source_vertex)
+        {
             nodes.push_back(i);
         }
     }
     int n = nodes.size();
     vector<int> answer_path;
     int TSP_shortest_path = INT_MAX;
-    do{
+    do
+    {
         int path_weight = 0;
         int j = source_vertex;
-        for(int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++)
+        {
             path_weight += current_graph_adjacency_matrix.matrix[j][nodes[i]];
             j = nodes[i];
         }
         path_weight += current_graph_adjacency_matrix.matrix[j][source_vertex];
-        if(path_weight<TSP_shortest_path){
+        if (path_weight < TSP_shortest_path)
+        {
             TSP_shortest_path = path_weight;
             answer_path.clear();
             answer_path.push_back(source_vertex);
-            for(int i = 0; i < n; i++){
+            for (int i = 0; i < n; i++)
+            {
                 answer_path.push_back(nodes[i]);
             }
         }
-    }while(next_permutation(nodes.begin(),nodes.end()));
+    } while (next_permutation(nodes.begin(), nodes.end()));
     answer_path.push_back(source_vertex);
     answer_path.push_back(TSP_shortest_path);
     return answer_path;
@@ -236,7 +244,9 @@ int main()
     {
         for (int i = 0; i < tasks.size(); i++)
         {
-            std::cout << endl << "#########################" << endl << endl;
+            std::cout << endl
+                      << "##################################################" << endl
+                      << endl;
             string graph_file_name = tasks[i][0];
             int number_of_repeats = stoi(tasks[i][1]);
             string shortest_path_weight = tasks[i][2];
@@ -245,7 +255,7 @@ int main()
             {
                 std::cout << "Cannot load graph from " << graph_file_name << " file." << endl;
             }
-            std::cout << "Computing TSP in " << graph_file_name << " graph with " << number_of_current_graph_vertices << " vertices repeated " << number_of_repeats << " times" << endl;
+            std::cout << "Computing TSP in " << graph_file_name << " graph repeated " << number_of_repeats << " times" << endl;
             if (number_of_current_graph_vertices < 1)
             {
                 std::cout << "Cannot execute task. The array must to have at least 1 element.";
@@ -256,26 +266,33 @@ int main()
             }
             else
             {
-                high_resolution_clock::time_point t_end = high_resolution_clock::now();
-                duration<double> time_span = duration<double>(0);
+                vector<int> answer;
                 high_resolution_clock::time_point t_start = high_resolution_clock::now();
-                for(int j = 0; j < number_of_repeats; j++){
-                    vector<int> answer = TSP_brute_force();
-                    int weight = answer[answer.size()-1];
-                    string path = "";
-                    answer.pop_back();
-                    std::vector<int>::iterator it = answer.begin();
-                    while (it != answer.end())
-                    {
-                        path += to_string(*it);
-                        path += " ";
-                        it++;
-                    }
-                    ltrim(path);
-                    rtrim(path);
-                    cout<< "Calculated shortest path: "<< path << endl << "Defined shortest path:    " << shortest_path << endl <<"Calculated weight: " << weight << endl << "Defined weight:    " << shortest_path_weight << endl;
-
+                for (int j = 0; j < number_of_repeats; j++)
+                {
+                    answer = TSP_brute_force();
                 }
+                high_resolution_clock::time_point t_end = high_resolution_clock::now();
+                duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+                int weight = answer[answer.size() - 1];
+                string path = "";
+                answer.pop_back();
+                std::vector<int>::iterator it = answer.begin();
+                while (it != answer.end())
+                {
+                    path += to_string(*it);
+                    path += " ";
+                    it++;
+                }
+                ltrim(path);
+                rtrim(path);
+                cout << "Calculated shortest path: " << path << endl
+                     << "Defined shortest path:    " << shortest_path << endl
+                     << "Calculated weight: " << weight << endl
+                     << "Defined weight:    " << shortest_path_weight << endl
+                     << "Time: " << ((double)time_span.count() / (double)number_of_repeats) << " s" << endl;
+                Result result = Result(graph_file_name,path,weight,time_span.count(),number_of_repeats);
+                results.push_back(result.toString());
             }
         }
     }
