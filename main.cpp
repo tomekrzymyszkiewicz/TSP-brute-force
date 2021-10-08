@@ -21,7 +21,6 @@ using namespace std::chrono;
 vector<vector<string>> tasks;
 vector<string> results;
 string results_file_name = "";
-vector<node> graph_data = vector<node>();
 int number_of_current_graph_vertices = 0;
 adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
 
