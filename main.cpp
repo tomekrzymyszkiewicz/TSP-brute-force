@@ -214,11 +214,13 @@ vector<int> TSP_brute_force()
         if(path_weight<TSP_shortest_path){
             TSP_shortest_path = path_weight;
             answer_path.clear();
+            answer_path.push_back(source_vertex);
             for(int i = 0; i < n; i++){
                 answer_path.push_back(nodes[i]);
             }
         }
     }while(next_permutation(nodes.begin(),nodes.end()));
+    answer_path.push_back(source_vertex);
     answer_path.push_back(TSP_shortest_path);
     return answer_path;
 }
@@ -234,7 +236,7 @@ int main()
     {
         for (int i = 0; i < tasks.size(); i++)
         {
-            std::cout << endl;
+            std::cout << endl << "#########################" << endl << endl;
             string graph_file_name = tasks[i][0];
             int number_of_repeats = stoi(tasks[i][1]);
             string shortest_path_weight = tasks[i][2];
@@ -269,7 +271,9 @@ int main()
                         path += " ";
                         it++;
                     }
-                    cout<< "Shortest path: "<< path << endl << "Weight: " << weight << endl;
+                    ltrim(path);
+                    rtrim(path);
+                    cout<< "Calculated shortest path: "<< path << endl << "Defined shortest path:    " << shortest_path << endl <<"Calculated weight: " << weight << endl << "Defined weight:    " << shortest_path_weight << endl;
 
                 }
             }
