@@ -11,6 +11,9 @@
 #include <windows.h>
 #include <sstream>
 #include <iterator>
+#include <algorithm> 
+#include <cctype>
+#include <locale>
 #include "structures.h"
 using namespace std;
 using namespace std::chrono;
@@ -20,7 +23,6 @@ vector<string> results;
 string results_file_name = "";
 vector<node> graph_data = vector<node>();
 int number_of_current_graph_vertices = 0;
-int number_of_current_graph_edges = 0;
 adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
 
 
@@ -76,6 +78,20 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
 bool load_data(string file_name)
 {
     std::cout << "Loading data from " << file_name << " file" << endl;
@@ -88,18 +104,34 @@ bool load_data(string file_name)
         return false;
     }
     string loaded_source, loaded_destination, loaded_weight;
-    int edges_loaded = 0;
-    fin >> number_of_current_graph_vertices;
+    string loaded_number_of_vertices;
+    getline(fin,loaded_number_of_vertices);
+    number_of_current_graph_vertices = stoi(loaded_number_of_vertices);
     current_graph_adjacency_matrix = adjacency_matrix(number_of_current_graph_vertices);
     for(int i = 0; i < number_of_current_graph_vertices-1; i++){
         string loaded_line_of_matrix = "";
         getline(fin,loaded_line_of_matrix);
+        ltrim(loaded_line_of_matrix);
+        rtrim(loaded_line_of_matrix);
         vector<string> single_line = split(loaded_line_of_matrix,' ');
+        std::vector<std::string>::iterator it = single_line.begin();
+        while(it != single_line.end()){
+            if(it->length() == 0){
+                it = single_line.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
         for(int j = 0; j < single_line.size(); j++){
+            ltrim(single_line[j]);
+            rtrim(single_line[j]);
             current_graph_adjacency_matrix.add_edge_undir(i,j,stoi(single_line[j]));
         }
     }
-    std::cout << "Loaded correctly " << edges_loaded << " edges and " << number_of_current_graph_vertices << " vertices" << endl;
+    std::cout << "Loaded correctly graph with "<< number_of_current_graph_vertices << " vertices" << endl;
+    current_graph_adjacency_matrix.print();
     fin.close();
     return true;
 }
@@ -147,6 +179,11 @@ void load_config()
     return;
 }
 
+int** TSP_brute_force(){
+    
+}
+
+
 int main()
 {
     load_config();
@@ -167,8 +204,8 @@ int main()
             {
                 std::cout << "Cannot load graph from " << graph_file_name << " file." << endl;
             }
-            std::cout << "Computing TSP in " << graph_file_name << " graph with " << number_of_current_graph_edges << " edges and " << number_of_current_graph_vertices << " vertices repeated " << number_of_repeats << " times" << endl;
-            if (number_of_current_graph_edges < 1)
+            std::cout << "Computing TSP in " << graph_file_name << " graph with " << number_of_current_graph_vertices << " vertices repeated " << number_of_repeats << " times" << endl;
+            if (number_of_current_graph_vertices < 1)
             {
                 std::cout << "Cannot execute task. The array must to have at least 1 element.";
             }
