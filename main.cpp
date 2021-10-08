@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <sstream>
 #include <iterator>
-#include <algorithm> 
+#include <algorithm>
 #include <cctype>
 #include <locale>
 #include "structures.h"
@@ -25,14 +25,13 @@ vector<node> graph_data = vector<node>();
 int number_of_current_graph_vertices = 0;
 adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
 
-
 struct Result
 {
     string graph_name;
-    int* path;
+    int *path;
     double time;
     int number_of_repeats;
-    Result(string graph_name, int* path, double time, int number_of_repeats)
+    Result(string graph_name, int *path, double time, int number_of_repeats)
     {
         this->graph_name = graph_name;
         this->path = path;
@@ -40,9 +39,10 @@ struct Result
         this->number_of_repeats = number_of_repeats;
     }
     string toString()
-    {   
+    {
         string path_string = "";
-        for(int i = 0; i < number_of_current_graph_vertices; i++){
+        for (int i = 0; i < number_of_current_graph_vertices; i++)
+        {
             path_string += path[i];
             path_string += " ";
         }
@@ -65,31 +65,36 @@ void save_results(string results_file_name)
 }
 
 template <typename Out>
-void split(const std::string &s, char delim, Out result) {
+void split(const std::string &s, char delim, Out result)
+{
     std::istringstream iss(s);
     std::string item;
-    while (std::getline(iss, item, delim)) {
+    while (std::getline(iss, item, delim))
+    {
         *result++ = item;
     }
 }
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, char delim)
+{
     std::vector<std::string> elems;
     split(s, delim, std::back_inserter(elems));
     return elems;
 }
 
 // trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
+static inline void ltrim(std::string &s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+                                    { return !std::isspace(ch); }));
 }
 
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
+static inline void rtrim(std::string &s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+                         { return !std::isspace(ch); })
+                .base(),
+            s.end());
 }
 
 bool load_data(string file_name)
@@ -105,18 +110,21 @@ bool load_data(string file_name)
     }
     string loaded_source, loaded_destination, loaded_weight;
     string loaded_number_of_vertices;
-    getline(fin,loaded_number_of_vertices);
+    getline(fin, loaded_number_of_vertices);
     number_of_current_graph_vertices = stoi(loaded_number_of_vertices);
     current_graph_adjacency_matrix = adjacency_matrix(number_of_current_graph_vertices);
-    for(int i = 0; i < number_of_current_graph_vertices-1; i++){
+    for (int i = 0; i < number_of_current_graph_vertices; i++)
+    {
         string loaded_line_of_matrix = "";
-        getline(fin,loaded_line_of_matrix);
+        getline(fin, loaded_line_of_matrix);
         ltrim(loaded_line_of_matrix);
         rtrim(loaded_line_of_matrix);
-        vector<string> single_line = split(loaded_line_of_matrix,' ');
+        vector<string> single_line = split(loaded_line_of_matrix, ' ');
         std::vector<std::string>::iterator it = single_line.begin();
-        while(it != single_line.end()){
-            if(it->length() == 0){
+        while (it != single_line.end())
+        {
+            if (it->length() == 0)
+            {
                 it = single_line.erase(it);
             }
             else
@@ -124,13 +132,15 @@ bool load_data(string file_name)
                 ++it;
             }
         }
-        for(int j = 0; j < single_line.size(); j++){
+        for (int j = 0; j < single_line.size(); j++)
+        {
             ltrim(single_line[j]);
             rtrim(single_line[j]);
-            current_graph_adjacency_matrix.add_edge_undir(i,j,stoi(single_line[j]));
+            current_graph_adjacency_matrix.add_edge_dir(i, j, stoi(single_line[j]));
         }
     }
-    std::cout << "Loaded correctly graph with "<< number_of_current_graph_vertices << " vertices" << endl;
+    std::cout << "Loaded correctly graph with " << number_of_current_graph_vertices << " vertices" << endl
+              << "Graph:" << endl;
     current_graph_adjacency_matrix.print();
     fin.close();
     return true;
@@ -148,23 +158,25 @@ void load_config()
         return;
     }
     string loaded_line_of_task = "";
-    getline(fin,results_file_name);
-    while (getline(fin,loaded_line_of_task))
+    getline(fin, results_file_name);
+    while (getline(fin, loaded_line_of_task))
     {
-        vector<string> single_line = split(loaded_line_of_task,' ');
+        vector<string> single_line = split(loaded_line_of_task, ' ');
         string graph_file_name, number_of_repeats, shortest_path_weight, shortest_path;
-        if(single_line.size() >= 4){
+        if (single_line.size() >= 4)
+        {
             graph_file_name = single_line[0];
             number_of_repeats = single_line[1];
             shortest_path_weight = single_line[2];
-            for(int i = 3; i < single_line.size(); i++){
+            for (int i = 3; i < single_line.size(); i++)
+            {
                 shortest_path += single_line[i];
                 shortest_path += " ";
             }
         }
         if (graph_file_name.size() == 0 || number_of_repeats.size() == 0 || shortest_path_weight.size() == 0 || shortest_path.size() == 0)
         {
-            std::cout << "Cannot load this task: " << graph_file_name <<" "<< number_of_repeats <<" "<< shortest_path_weight <<" "<< shortest_path;
+            std::cout << "Cannot load this task: " << graph_file_name << " " << number_of_repeats << " " << shortest_path_weight << " " << shortest_path;
             break;
         }
         vector<string> task;
@@ -179,10 +191,37 @@ void load_config()
     return;
 }
 
-int** TSP_brute_force(){
-    
+vector<int> TSP_brute_force()
+{
+    int source_vertex = 0;
+    vector<int> nodes;
+    for(int i = 0; i < number_of_current_graph_vertices; i++){
+        if(i != source_vertex){
+            nodes.push_back(i);
+        }
+    }
+    int n = nodes.size();
+    vector<int> answer_path;
+    int TSP_shortest_path = INT_MAX;
+    do{
+        int path_weight = 0;
+        int j = source_vertex;
+        for(int i = 0; i < n; i++){
+            path_weight += current_graph_adjacency_matrix.matrix[j][nodes[i]];
+            j = nodes[i];
+        }
+        path_weight += current_graph_adjacency_matrix.matrix[j][source_vertex];
+        if(path_weight<TSP_shortest_path){
+            TSP_shortest_path = path_weight;
+            answer_path.clear();
+            for(int i = 0; i < n; i++){
+                answer_path.push_back(nodes[i]);
+            }
+        }
+    }while(next_permutation(nodes.begin(),nodes.end()));
+    answer_path.push_back(TSP_shortest_path);
+    return answer_path;
 }
-
 
 int main()
 {
@@ -215,7 +254,24 @@ int main()
             }
             else
             {
-                
+                high_resolution_clock::time_point t_end = high_resolution_clock::now();
+                duration<double> time_span = duration<double>(0);
+                high_resolution_clock::time_point t_start = high_resolution_clock::now();
+                for(int j = 0; j < number_of_repeats; j++){
+                    vector<int> answer = TSP_brute_force();
+                    int weight = answer[answer.size()-1];
+                    string path = "";
+                    answer.pop_back();
+                    std::vector<int>::iterator it = answer.begin();
+                    while (it != answer.end())
+                    {
+                        path += to_string(*it);
+                        path += " ";
+                        it++;
+                    }
+                    cout<< "Shortest path: "<< path << endl << "Weight: " << weight << endl;
+
+                }
             }
         }
     }
