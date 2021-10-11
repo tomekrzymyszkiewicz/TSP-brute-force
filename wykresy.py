@@ -25,7 +25,6 @@ def main():
     pllt.ylabel('Czas wykonywania algorytmu[s]')
     pllt.legend()
     pllt.show()
-    pass
 
 
 if __name__ == "__main__":
