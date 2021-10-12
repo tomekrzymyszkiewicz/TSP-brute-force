@@ -41,12 +41,6 @@ struct Result
     }
     string toString()
     {
-        // string path_string = "";
-        // for (int i = 0; i < number_of_current_graph_vertices; i++)
-        // {
-        //     path_string += path[i];
-        //     path_string += " ";
-        // }
         return (graph_name + "," + path + "," + to_string(path_weight) + "," + to_string(time) + "," + to_string(number_of_repeats));
     }
 };
