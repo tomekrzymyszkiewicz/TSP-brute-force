@@ -103,7 +103,6 @@ bool load_data(string file_name)
         fin.close();
         return false;
     }
-    string loaded_source, loaded_destination, loaded_weight;
     string loaded_number_of_vertices;
     getline(fin, loaded_number_of_vertices);
     number_of_current_graph_vertices = stoi(loaded_number_of_vertices);
@@ -129,8 +128,6 @@ bool load_data(string file_name)
         }
         for (int j = 0; j < single_line.size(); j++)
         {
-            ltrim(single_line[j]);
-            rtrim(single_line[j]);
             current_graph_adjacency_matrix.add_edge_dir(i, j, stoi(single_line[j]));
         }
     }
@@ -148,12 +145,12 @@ void load_config()
     fin.open("config.ini", ios::in);
     if (!fin.good())
     {
-        std::cout << "Config.ini not found" << endl;
+        std::cout << "config.ini not found" << endl;
         fin.close();
         return;
     }
-    string loaded_line_of_task = "";
     getline(fin, results_file_name);
+    string loaded_line_of_task = "";
     while (getline(fin, loaded_line_of_task))
     {
         vector<string> single_line = split(loaded_line_of_task, ' ');
